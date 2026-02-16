@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A&I ARMOUR - Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00ff41;
+            --primary-glow: rgba(0, 255, 65, 0.3);
+            --secondary: #ff3366;
+            --bg-dark: #0a0e27;
+            --bg-panel: #141829;
+            --bg-card: #1a1f3a;
+            --text-primary: #e0e6ff;
+            --text-secondary: #8b92b8;
+            --border: #2a3150;
+            --warning: #ffaa00;
+            --success: #00ff41;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 255, 65, 0.05) 25%, rgba(0, 255, 65, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 65, 0.05) 75%, rgba(0, 255, 65, 0.05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 255, 65, 0.05) 25%, rgba(0, 255, 65, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 65, 0.05) 75%, rgba(0, 255, 65, 0.05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), #00cc33);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--primary), #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: var(--success);
+        }
+
+        /* Main Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 20px;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Left Panel - Metrics */
+        .metrics-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .metric-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            animation: slideRight 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .metric-card:nth-child(1) { animation-delay: 0.1s; }
+        .metric-card:nth-child(2) { animation-delay: 0.2s; }
+        .metric-card:nth-child(3) { animation-delay: 0.3s; }
+        .metric-card:nth-child(4) { animation-delay: 0.4s; }
+        .metric-card:nth-child(5) { animation-delay: 0.5s; }
+        .metric-card:nth-child(6) { animation-delay: 0.6s; }
+        .metric-card:nth-child(7) { animation-delay: 0.7s; }
+        .metric-card:nth-child(8) { animation-delay: 0.8s; }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .metric-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+            transform: translateX(5px);
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .metric-change {
+            font-size: 12px;
+            margin-top: 5px;
+            color: var(--success);
+        }
+
+        .metric-change.negative {
+            color: var(--secondary);
+        }
+
+        /* Center Panel - Command Chat */
+        .command-chat {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 180px);
+            animation: scaleIn 0.6s ease-out 0.3s both;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .chat-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .message {
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-left: 3px solid var(--primary);
+            border-radius: 4px;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.agent {
+            border-left-color: var(--warning);
+        }
+
+        .message.system {
+            border-left-color: var(--text-secondary);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .message-author {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--primary);
+        }
+
+        .message.agent .message-author {
+            color: var(--warning);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .message-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .chat-input button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), #00cc33);
+            border: none;
+            border-radius: 6px;
+            color: var(--bg-dark);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chat-input button:hover {
+            box-shadow: 0 0 20px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Right Panel - Agents */
+        .agents-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .agent-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            animation: slideLeft 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .agent-card:nth-child(1) { animation-delay: 0.1s; }
+        .agent-card:nth-child(2) { animation-delay: 0.2s; }
+        .agent-card:nth-child(3) { animation-delay: 0.3s; }
+        .agent-card:nth-child(4) { animation-delay: 0.4s; }
+        .agent-card:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .agent-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .agent-status.active {
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--success);
+        }
+
+        .agent-status.idle {
+            background: rgba(255, 170, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .agent-status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .agent-last-action {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .agent-stats {
+            display: flex;
+            gap: 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .agent-stat {
+            flex: 1;
+        }
+
+        .agent-stat-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .agent-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-panel {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">A&I</div>
+                <div class="logo-text">
+                    <h1>A&I ARMOUR</h1>
+                    <p>Autonomous Command Center</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <div class="status-dot"></div>
+                <div class="status-text">ALL SYSTEMS OPERATIONAL</div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Panel: Metrics -->
+            <div class="metrics-panel">
+                <div class="metric-card">
+                    <div class="metric-label">💰 Money In (This Month)</div>
+                    <div class="metric-value">$47,850</div>
+                    <div class="metric-change">+23% vs last month</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">💸 Money Out (This Month)</div>
+                    <div class="metric-value">$18,200</div>
+                    <div class="metric-change negative">+12% vs last month</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">📧 Outbound Emails (Today)</div>
+                    <div class="metric-value">24</div>
+                    <div class="metric-change">AI sent automatically</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">📨 Inbound Enquiries</div>
+                    <div class="metric-value">12</div>
+                    <div class="metric-change">3 hot | 5 warm | 4 cold</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">✅ Installs to Date</div>
+                    <div class="metric-value">37</div>
+                    <div class="metric-change">+5 this week</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">📄 Invoices Sent</div>
+                    <div class="metric-value">42</div>
+                    <div class="metric-change">35 paid | 7 pending</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">✔️ Invoices Paid</div>
+                    <div class="metric-value">$52,100</div>
+                    <div class="metric-change">83% collection rate</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">📅 Upcoming Bookings</div>
+                    <div class="metric-value">8</div>
+                    <div class="metric-change">Next: Tomorrow 9AM</div>
+                </div>
+            </div>
+
+            <!-- Center Panel: Command Chat -->
+            <div class="command-chat">
+                <div class="chat-header">
+                    <h2>⚡ COMMAND CHAT - Team Activity Log</h2>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message system">
+                        <div class="message-header">
+                            <span class="message-author">SYSTEM</span>
+                            <span class="message-time">08:00:00</span>
+                        </div>
+                        <div class="message-content">A&I Armour Command Center initialized. All agents online.</div>
+                    </div>
+
+                    <div class="message agent">
+                        <div class="message-header">
+                            <span class="message-author">SALES AGENT</span>
+                            <span class="message-time">08:15:23</span>
+                        </div>
+                        <div class="message-content">New enquiry from Perth SMB (manufacturing). Sent quote: 2x NVIDIA boxes + custom tuning + installation. Est. value: $12,400. Flagged as HOT lead - they want rapid deployment.</div>
+                    </div>
+
+                    <div class="message agent">
+                        <div class="message-header">
+                            <span class="message-author">FINANCE AGENT</span>
+                            <span class="message-time">09:42:11</span>
+                        </div>
+                        <div class="message-content">Invoice #INV-1047 PAID - $6,800 received from Secure Tech Solutions. Updated cash flow projections.</div>
+                    </div>
+
+                    <div class="message agent">
+                        <div class="message-header">
+                            <span class="message-author">LOGISTICS AGENT</span>
+                            <span class="message-time">10:18:45</span>
+                        </div>
+                        <div class="message-content">WARNING: NVIDIA box inventory low (3 units remaining). Recommended reorder: 10 units. Supplier lead time: 5 days.</div>
+                    </div>
+
+                    <div class="message agent">
+                        <div class="message-header">
+                            <span class="message-author">CONTRACTOR AGENT</span>
+                            <span class="message-time">11:05:30</span>
+                        </div>
+                        <div class="message-content">Installation scheduled: Melbourne CBD office - Friday 2PM. Contractor: Dave M. (5-star rating). Client notified, calendar updated.</div>
+                    </div>
+
+                    <div class="message agent">
+                        <div class="message-header">
+                            <span class="message-author">SALES AGENT</span>
+                            <span class="message-time">12:33:17</span>
+                        </div>
+                        <div class="message-content">Follow-up sent to 4 warm leads. Offering limited-time discount for February installs. Conversion probability: 65%.</div>
+                    </div>
+
+                    <div class="message agent">
+                        <div class="message-header">
+                            <span class="message-author">SUPPORT AGENT</span>
+                            <span class="message-time">13:20:08</span>
+                        </div>
+                        <div class="message-content">Support ticket #SUP-089 resolved. Client question about firmware update - provided docs, marked as satisfied. No escalation needed.</div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <div class="input-wrapper">
+                        <input type="text" id="commandInput" placeholder="Type command or question for AI agents...">
+                        <button onclick="sendCommand()">SEND</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Agent Status -->
+            <div class="agents-panel">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">🤖 SALES AGENT</div>
+                        <div class="agent-status active">
+                            <div class="agent-status-dot"></div>
+                            ACTIVE
+                        </div>
+                    </div>
+                    <div class="agent-last-action">Processing 12 enquiries, sent 6 quotes, 2 follow-ups scheduled</div>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">Today</div>
+                            <div class="agent-stat-value">18</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">This Week</div>
+                            <div class="agent-stat-value">94</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">💰 FINANCE AGENT</div>
+                        <div class="agent-status active">
+                            <div class="agent-status-dot"></div>
+                            ACTIVE
+                        </div>
+                    </div>
+                    <div class="agent-last-action">Tracked 3 payments, sent 2 reminders, updated cash flow dashboard</div>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">Invoices</div>
+                            <div class="agent-stat-value">42</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">Paid</div>
+                            <div class="agent-stat-value">35</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">📦 LOGISTICS AGENT</div>
+                        <div class="agent-status idle">
+                            <div class="agent-status-dot"></div>
+                            IDLE
+                        </div>
+                    </div>
+                    <div class="agent-last-action">Monitoring inventory levels, next reorder check in 4 hours</div>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">Stock</div>
+                            <div class="agent-stat-value">3</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">In Transit</div>
+                            <div class="agent-stat-value">2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">🔧 CONTRACTOR AGENT</div>
+                        <div class="agent-status active">
+                            <div class="agent-status-dot"></div>
+                            ACTIVE
+                        </div>
+                    </div>
+                    <div class="agent-last-action">Coordinating 2 installations, updated 3 contractor schedules</div>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">Scheduled</div>
+                            <div class="agent-stat-value">8</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">Completed</div>
+                            <div class="agent-stat-value">37</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">🛡️ SUPPORT AGENT</div>
+                        <div class="agent-status idle">
+                            <div class="agent-status-dot"></div>
+                            IDLE
+                        </div>
+                    </div>
+                    <div class="agent-last-action">No active tickets. Monitoring 37 deployed systems.</div>
+                    <div class="agent-stats">
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">Open</div>
+                            <div class="agent-stat-value">0</div>
+                        </div>
+                        <div class="agent-stat">
+                            <div class="agent-stat-label">Resolved</div>
+                            <div class="agent-stat-value">89</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Command Chat functionality
+        function sendCommand() {
+            const input = document.getElementById('commandInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            // Add user message
+            const messagesDiv = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message';
+            userMessage.innerHTML = `
+                <div class="message-header">
+                    <span class="message-author">YOU</span>
+                    <span class="message-time">${time}</span>
+                </div>
+                <div class="message-content">${message}</div>
+            `;
+            
+            messagesDiv.appendChild(userMessage);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message agent';
+                aiMessage.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-author">AI COORDINATOR</span>
+                        <span class="message-time">${new Date().toLocaleTimeString('en-US', { hour12: false })}</span>
+                    </div>
+                    <div class="message-content">Command received: "${message}". Delegating to relevant agents. Will update you shortly.</div>
+                `;
+                messagesDiv.appendChild(aiMessage);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }, 1000);
+        }
+        
+        // Allow Enter key to send
+        document.getElementById('commandInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendCommand();
+            }
+        });
+
+        // Simulate live updates
+        setInterval(() => {
+            // Random agent activity simulation
+            const agents = ['SALES AGENT', 'FINANCE AGENT', 'LOGISTICS AGENT', 'CONTRACTOR AGENT', 'SUPPORT AGENT'];
+            const actions = [
+                'Processed new enquiry',
+                'Updated dashboard metrics',
+                'Sent automated follow-up',
+                'Monitored system status',
+                'Coordinated with contractors'
+            ];
+            
+            if (Math.random() > 0.7) { // 30% chance every 10 seconds
+                const messagesDiv = document.getElementById('chatMessages');
+                const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+                const agent = agents[Math.floor(Math.random() * agents.length)];
+                const action = actions[Math.floor(Math.random() * actions.length)];
+                
+                const message = document.createElement('div');
+                message.className = 'message agent';
+                message.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-author">${agent}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-content">${action}</div>
+                `;
+                
+                messagesDiv.appendChild(message);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }, 10000);
+    </script>
+</body>
+</html>
